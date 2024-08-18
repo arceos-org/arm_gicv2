@@ -1,13 +1,21 @@
+//! ARM Generic Interrupt Controller (GIC) register definitions and basic
+//! operations.
+
 #![no_std]
+#![feature(const_ptr_as_ref)]
 #![feature(const_option)]
 #![feature(const_nonnull_new)]
-#![doc = include_str!("../README.md")]
+
+pub mod gic_v2;
+
+mod device_ref;
+
+pub use gic_v2::GicDistributor;
+pub use gic_v2::GicCpuInterface;
+
+
 
 use core::ops::Range;
-
-mod gic_v2;
-
-pub use gic_v2::{GicCpuInterface, GicDistributor};
 
 /// Interrupt ID 0-15 are used for SGIs (Software-generated interrupt).
 ///
