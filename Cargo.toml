@@ -13,4 +13,4 @@ categories = ["embedded", "no-std", "hardware-support", "os"]
 
 [dependencies]
 tock-registers = "0.8"
-kspin = "0.1"
+spin = { version = "0.9.4", features = ["use_ticket_mutex"] }

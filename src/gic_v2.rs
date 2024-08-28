@@ -143,10 +143,11 @@ unsafe impl Send for GicCpuInterface {}
 unsafe impl Sync for GicCpuInterface {}
 
 use crate::device_ref::*;
+use spin::Mutex;
 
 static mut GICD: DeviceRef<GicDistributor> = unsafe { DeviceRef::new() };
 static mut GICC: DeviceRef<GicCpuInterface> = unsafe { DeviceRef::new() };
-static GICD_LOCK: spinlock::SpinNoIrq<()> = spinlock::SpinNoIrq::new(());
+static GICD_LOCK: Mutex<()> = Mutex::new(());
 
 pub fn gic_is_sgi(int_id: usize) -> bool {
     int_id < 16
