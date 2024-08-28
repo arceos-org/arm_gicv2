@@ -209,7 +209,7 @@ impl GicDistributor {
 
     /// Enables or disables the given interrupt.
     pub fn set_enable(vector: usize, enable: bool) {
-        // if vector >= self.max_irqs {
+        // if vector >= self::max_irqs {
         //     return;
         // }
 
@@ -292,7 +292,7 @@ impl GicDistributor {
             let off = (int_id % 4) * 8;
             if pend {
                 // TODO: current_cpu().id
-                // self.SPENDSGIR[reg_ind].set(1 << (off + current_cpu().id));
+                // self::SPENDSGIR[reg_ind].set(1 << (off + current_cpu().id));
                 unsafe { GICD.SPENDSGIR[reg_ind].set(1 << (off + 1)); }
             } else {
                 unsafe { GICD.CPENDSGIR[reg_ind].set(0b11111111 << off); }
@@ -362,7 +362,7 @@ impl GicDistributor {
     ///
     /// This function should be called only once.
     pub fn init() {
-        let max_irqs = Self.max_irqs();
+        let max_irqs = Self::max_irqs();
         assert!(max_irqs <= GIC_MAX_IRQ);;
 
         // Disable all interrupts
@@ -371,7 +371,7 @@ impl GicDistributor {
             unsafe{ GICD.ICPENDR[i / 32].set(u32::MAX); }
             unsafe{ GICD.ICACTIVER[i / 32].set(u32::MAX); }
         }
-        if Self.cpu_num() > 1 {
+        if Self::cpu_num() > 1 {
             for i in (SPI_RANGE.start..max_irqs).step_by(4) {
                 // Set external interrupts to target cpu 0
                 unsafe{ GICD.ITARGETSR[i / 4].set(0x01_01_01_01); }
@@ -433,11 +433,11 @@ impl GicCpuInterface {
     where
         F: FnOnce(u32),
     {
-        let iar = Self.iar();
+        let iar = Self::iar();
         let vector = iar & 0x3ff;
         if vector < 1020 {
             handler(vector);
-            Self.set_eoi(iar);
+            Self::set_eoi(iar);
         } else {
             // spurious
         }
@@ -450,10 +450,10 @@ impl GicCpuInterface {
     /// This function should be called only once.
     pub fn init() {
         // enable GIC0
-        Self.set_ctrlr(0x1);
+        Self::set_ctrlr(0x1);
         // #[cfg(feature = "hv")]
         // // set EOImodeNS and EN bit for hypervisor
-        // self.CTLR.set(1| 0x200);
+        // self::CTLR.set(1| 0x200);
         // unmask interrupts at all priority levels
         unsafe { GICC.PMR.set(0xff); }
     }
