@@ -29,6 +29,8 @@ pub const SPI_RANGE: Range<usize> = 32..1020;
 /// Maximum number of interrupts supported by the GIC.
 pub const GIC_MAX_IRQ: usize = 1024;
 
+pub const GIC_CONFIG_BITS: usize = 2;
+
 /// Interrupt trigger mode.
 pub enum TriggerMode {
     /// Edge-triggered.
