@@ -9,11 +9,11 @@ use tock_registers::interfaces::{Readable, Writeable};
 use tock_registers::register_structs;
 use tock_registers::registers::{ReadOnly, ReadWrite, WriteOnly};
 
-use crate::SGI_RANGE;
 use crate::GIC_CONFIG_BITS;
+use crate::SGI_RANGE;
 
 register_structs! {
-    
+
     #[allow(non_snake_case)]
     GicDistributorRegs {
         /// Distributor Control Register.
@@ -202,7 +202,9 @@ impl GicDistributor {
 
     /// Send ipi to cpu.
     pub fn send_sgi(&mut self, cpu_if: usize, sgi_num: usize) {
-        self.regs().SGIR.set(((1 << (16 + cpu_if)) | (sgi_num & 0b1111)) as u32);
+        self.regs()
+            .SGIR
+            .set(((1 << (16 + cpu_if)) | (sgi_num & 0b1111)) as u32);
     }
 
     /// Get interrupt priority.
@@ -322,7 +324,6 @@ impl GicDistributor {
         self.regs().ICFGR[reg_ind].set((icfgr & !mask) | (((cfg as u32) << off) & mask));
     }
 
-
     /// Initializes the GIC distributor.
     ///
     /// It disables all interrupts, sets the target of all SPIs to CPU 0,
@@ -367,8 +368,8 @@ impl GicCpuInterface {
         unsafe { self.base.as_ref() }
     }
 
-    // When interrupt priority drop is separated from interrupt deactivation,
-    // a write to this register deactivates the specified interrupt.
+    /// When interrupt priority drop is separated from interrupt deactivation,
+    /// a write to this register deactivates the specified interrupt.
     pub fn set_dir(&self, dir: u32) {
         self.regs().DIR.set(dir);
     }
@@ -430,12 +431,13 @@ impl GicCpuInterface {
     ///
     /// This function should be called only once.
     pub fn init(&self) {
-        #[cfg(not(feature = "hv"))]
+        #[cfg(not(feature = "el2"))]
         self.regs().CTLR.set(1);
-        #[cfg(feature = "hv")] {
+        #[cfg(feature = "el2")]
+        {
             // EOImodeNS, bit [9] Controls the behavior of Non-secure accesses to GICC_EOIR GICC_AEOIR, and GICC_DIR
             // EnableGrp0, bit [0] Enables the signaling of Group 0 interrupts by the CPU interface to a target PE:
-            self.regs().CTLR.set(1| 1 << 9);
+            self.regs().CTLR.set(1 | 1 << 9);
         }
         // unmask interrupts at all priority levels
         self.regs().PMR.set(0xff);
