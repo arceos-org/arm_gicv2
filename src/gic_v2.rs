@@ -13,7 +13,7 @@ use crate::GIC_CONFIG_BITS;
 use crate::SGI_RANGE;
 
 register_structs! {
-
+    /// GIC Distributor registers.
     #[allow(non_snake_case)]
     GicDistributorRegs {
         /// Distributor Control Register.
@@ -335,7 +335,7 @@ impl GicDistributor {
         assert!(max_irqs <= GIC_MAX_IRQ);
         self.max_irqs = max_irqs;
 
-        /// Disable all interrupts
+        // Disable all interrupts
         for i in (0..max_irqs).step_by(32) {
             self.regs().ICENABLER[i / 32].set(u32::MAX);
             self.regs().ICPENDR[i / 32].set(u32::MAX);
@@ -346,12 +346,12 @@ impl GicDistributor {
                 self.regs().ITARGETSR[i / 4].set(0x01_01_01_01);
             }
         }
-        /// Initialize all the SPIs to edge triggered
+        // Initialize all the SPIs to edge triggered
         for i in SPI_RANGE.start..max_irqs {
             self.configure_interrupt(i, TriggerMode::Edge);
         }
 
-        /// enable GIC0
+        // enable GIC0
         self.regs().CTLR.set(1);
     }
 }
