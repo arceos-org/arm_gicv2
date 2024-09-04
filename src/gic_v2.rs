@@ -431,6 +431,7 @@ impl GicCpuInterface {
     ///
     /// This function should be called only once.
     pub fn init(&self) {
+        // enable GIC0
         #[cfg(not(feature = "el2"))]
         self.regs().CTLR.set(1);
         #[cfg(feature = "el2")]
